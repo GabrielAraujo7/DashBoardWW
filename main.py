@@ -42,6 +42,7 @@ df_mun = pd.read_excel(
 )
 
 
+
 # ============================================================
 # ETAPA 2 — TRATAMENTO DA BASE DO IBGE
 # Renomeia colunas e padroniza município
@@ -54,6 +55,8 @@ df_mun.columns = [
     "nome_municipio",
     "populacao"
 ]
+
+df_mun = df_mun[df_mun["uf"] == "CE"]
 
 df_mun["municipio"] = df_mun["nome_municipio"].apply(limpar_texto)
 
