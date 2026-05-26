@@ -164,6 +164,55 @@ mapa_regiao = {
 df_final["regiao"] = df_final["uf"].map(mapa_regiao)
 
 
+
+df_map = pd.read_csv("municipios.csv")
+
+
+
+df_geo = pd.read_csv("municipios.csv")
+
+df_geo["municipio"] = df_geo["nome"].apply(limpar_texto)
+
+df_geo = df_geo[df_geo["codigo_uf"] == 23]  # Ceará
+
+df_geo = df_geo[["municipio", "latitude", "longitude"]]
+
+df_final = df_final.merge(
+    df_geo,
+    on="municipio",
+    how="left"
+)
+
+
+
+df_geo = pd.read_csv("municipios.csv")
+
+df_geo["municipio"] = df_geo["nome"].apply(limpar_texto)
+
+df_geo = df_geo[df_geo["codigo_uf"] == 23]
+
+df_geo = df_geo[
+    ["municipio", "latitude", "longitude"]
+]
+
+df_final = df_final.merge(
+    df_geo,
+    on="municipio",
+    how="left"
+)
+
+df_final = df_final.drop(
+    columns=["latitude_y", "longitude_y"],
+    errors="ignore"
+)
+
+df_final = df_final.rename(columns={
+    "latitude_x": "latitude",
+    "longitude_x": "longitude"
+})
+
+df_filtrado = df_final.copy()
+
 # ============================================================
 # ETAPA 10 — EXPORTAÇÃO DA BASE TRATADA
 # Essa base pode ser usada no Qlik, Power BI ou Excel
@@ -328,3 +377,34 @@ else:
 st.subheader("Base Final Enriquecida")
 
 st.dataframe(df_filtrado)
+
+
+
+
+st.subheader("Mapa Interativo dos Atendimentos SUS")
+
+fig_mapa = px.scatter_mapbox(
+    df_filtrado,
+    lat="latitude",
+    lon="longitude",
+    size="total_atendimentos",
+    color="atendimentos_100k",
+    hover_name="municipio",
+    hover_data={
+        "total_atendimentos": True,
+        "populacao": True,
+        "atendimentos_100k": ":.2f",
+        "latitude": False,
+        "longitude": False
+    },
+    zoom=6,
+    height=650,
+    title="Mapa dos Atendimentos SUS por Município"
+)
+
+fig_mapa.update_layout(
+    mapbox_style="open-street-map",
+    margin={"r": 0, "t": 50, "l": 0, "b": 0}
+)
+
+st.plotly_chart(fig_mapa, use_container_width=True)
