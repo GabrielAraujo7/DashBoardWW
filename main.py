@@ -177,25 +177,6 @@ df_final.to_csv(
 
 
 # ============================================================
-# SIDEBAR — FILTROS DO DASHBOARD
-# ============================================================
-
-st.sidebar.header("Filtros")
-
-ufs = sorted(df_final["uf"].dropna().unique())
-
-uf_selecionada = st.sidebar.multiselect(
-    "Selecione a UF",
-    options=ufs,
-    default=ufs
-)
-
-df_filtrado = df_final[
-    df_final["uf"].isin(uf_selecionada)
-]
-
-
-# ============================================================
 # KPIs PRINCIPAIS
 # ============================================================
 
@@ -323,33 +304,6 @@ fig_scatter = px.scatter(
 
 st.plotly_chart(fig_scatter, use_container_width=True)
 
-
-# ============================================================
-# GRÁFICO 5 — ATENDIMENTOS POR REGIÃO
-# Como a base parece concentrada no CE, tende a aparecer Nordeste
-# ============================================================
-
-st.subheader("Volume por Região")
-
-regiao_df = (
-    df_filtrado
-    .groupby("regiao")["total_atendimentos"]
-    .sum()
-    .reset_index()
-)
-
-fig_regiao = px.bar(
-    regiao_df,
-    x="regiao",
-    y="total_atendimentos",
-    title="Total de Atendimentos por Região",
-    labels={
-        "regiao": "Região",
-        "total_atendimentos": "Total de Atendimentos"
-    }
-)
-
-st.plotly_chart(fig_regiao, use_container_width=True)
 
 
 # ============================================================
